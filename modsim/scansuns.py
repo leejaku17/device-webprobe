@@ -24,8 +24,9 @@ log.addHandler(console_handler)
 
 
 class SunsScanner:
-    def __init__(self, opts):
+    def __init__(self, opts, args):
         self.options = opts
+        self.output = args[0]
 
     def scan(self):
         if self.options.mode == 'tcp':
@@ -73,14 +74,39 @@ class SunsScanner:
         return data[0] == 21365 and data[1] == 28243
 
     def scan_sunspec(self, master, start):
-        while True:
-            result = master.execute(self.options.addr, cst.READ_HOLDING_REGISTERS, start, 2)
-            model = result[0]
-            length = result[1]
-            log.info(f"- Model: {model}, Len: {length}")
-            if model == 65535:
-                break
-            start += result[1]+2
+        with open(self.output, "w") as file:
+            file.write("<mbmap>\n")
+            file.write("    <regs>53 75 6E 53</regs>\n")
+            while True:
+                result = master.execute(self.options.addr, cst.READ_HOLDING_REGISTERS, start, 2)
+                model = result[0]
+                length = result[1]
+                log.info(f"- Model: {model}, Len: {length}")
+                file.write(f"    <!-- Model {model}, Length {length} -->\n")
+                file.write(f"    <regs>{self.tuple_to_hexa(result)}</regs>\n")
+                if model == 65535:
+                    break
+
+                offset = start + 2
+                remain = length
+                while remain > 0:
+                    result = master.execute(self.options.addr, cst.READ_HOLDING_REGISTERS, offset, min(remain, 100))
+                    file.write(f"    <regs>{self.tuple_to_hexa(result)}</regs>\n")
+                    remain -= len(result)
+                    offset += len(result)
+
+                start += length+2
+            file.write("</mbmap>\n")
+
+    @staticmethod
+    def tuple_to_hexa(data):
+        hexa_array = []
+        for value in data:
+            # log.info(f"value = {value} {value:04X}")
+            hexa_array.append(f"{value:04X}"[0:2])
+            hexa_array.append(f"{value:04X}"[2:4])
+        hex_values = " ".join(hexa_array)
+        return hex_values
 
 
 if __name__ == "__main__":
@@ -114,5 +140,5 @@ if __name__ == "__main__":
         print(parser.print_help())
         sys.exit(1)
 
-    scanner = SunsScanner(options)
+    scanner = SunsScanner(options, args)
     scanner.scan()
