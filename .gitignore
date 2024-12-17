@@ -1,1 +1,68 @@
+# Python 관련
+*.py[cod]       # 컴파일된 Python 파일
+__pycache__/    # 캐시 디렉토리
+*.pyo           # 최적화된 Python 파일
+*.pyc
+
+# 가상 환경
+env/
+venv/
+ENV/
+.venv/
+.virtualenv/
+
+# 배포 파일
+*.egg
+*.egg-info/
+dist/
+build/
+*.wheel
+
+# 테스트 파일
+.tox/
+.nox/
+.coverage
+*.cover
+coverage.xml
+*.pytest_cache/
+nosetests.xml
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE 및 편집기 설정 파일
+.vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+
+# 운영체제 관련
+.DS_Store          # macOS
+Thumbs.db          # Windows
+
+# 로그 및 임시 파일
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.lock
+*.pid
+*.seed
+*.orig
+
+# 데이터베이스
+*.sqlite3
+*.db
+
+# 환경 파일
+.env
+.env.* 
+*.ini
+
+# 기타
+*.tgz
+*.gz
+*.zip
+*.7z
+*.rar
